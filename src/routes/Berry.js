@@ -1,46 +1,49 @@
-import React from "react";
-import { connect, useSelector } from "react-redux";
+import React, { useState, useEffect } from "react";
+import { connect, useSelector, useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import { fetchBerry } from "../store/actions";
+import loader from "../assets/Bee-Hollow-Farm-beekeeping-classes-and-events-near-Schodack-.gif";
 
-// const state = (state) => state.berryDetails
 const state = (state) => state.berriesCollection;
 const Berry = (props) => {
-  const { myBerryDetails, myFetchBerry } = props;
+  const [currentBerryHolder, setCurrentBerryHolder] = useState(null);
   const currentBerry = useSelector(state).currentBerry;
+  const dispatch = useDispatch();
   console.log(currentBerry);
+  console.log(window.location.pathname);
+  useEffect(() => {
+    if (currentBerry) {
+      setCurrentBerryHolder({ ...currentBerry });
+    } else {
+      (async () => {
+        let berryName = window.location.pathname.toString();
+        berryName = berryName.split("/");
+        console.log(berryName, berryName.length);
+        berryName = berryName[berryName.length - 1];
+        setCurrentBerryHolder({ ...(await fetchBerry(berryName)(dispatch)) });
+      })();
+    }
+  }, []);
 
-  const berryDetails = myBerryDetails;
-  // console.log(berryDetails) undefined results
-
-  const handleBerryItemsClick = (e) => {
-    // myFetchBerry(e);
-  };
   return (
     <div>
-      <h2>Berry Name: {currentBerry.name} </h2>
-      {currentBerry ? 
-        <div key={currentBerry.id}>
-          {currentBerry.url} {currentBerry.name}{" "}
+      {currentBerryHolder && <h2>Berry Name: {currentBerryHolder.name} </h2>}
+      {currentBerryHolder !== null ? (
+        <div key={currentBerryHolder.id}>
+          {currentBerryHolder.name}{" "}
           <p>
             Please see the berry items{" "}
-            <Link
-              to="/berryItems"
-              // onClick={() => handleBerryItemsClick(currentBerry.name)}
-            >
+            <Link to={`/berryItems/${currentBerryHolder.name}`}>
               BerryItems
             </Link>{" "}
             here.
           </p>
         </div>
-       : <h6>No current berry selected!</h6>}
-      {/* <Link
-        to="/berryItems"
-        value={berry}
-        onClick={() => handleBerryClick(berry)}
-      >
-        BerryItems
-      </Link> */}
+      ) : (
+        <div>
+          <img src={loader} alt="loading" />
+        </div>
+      )}
     </div>
   );
 };

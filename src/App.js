@@ -32,8 +32,8 @@ function App() {
         <Routes>
           <Route path="/" exact element={<Home />}></Route>
           <Route path="/berries" element={<Berries />}> </Route>
-          <Route path="/berry" element={<Berry />}></Route>
-          <Route path="/berryItems" element={<BerryItems />}></Route>
+          <Route path="/berry/*" element={<Berry />}></Route>
+          <Route path="/berryItems/*" element={<BerryItems />}></Route>
             {/* <Route path=":berry" element={<Berry />}>
               <Route path=":berryItems" element={<BerryItems />}></Route>
             </Route> */}

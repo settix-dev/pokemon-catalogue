@@ -1,25 +1,7 @@
 import React from "react";
 
 export const berriesApiList = [
-  "cheri",
-  "chesto",
-  "pecha",
-  "aspear",
-  "leppa",
-  "oran",
-  "persim",
-  "lum",
-  "sitrus",
-  "figy",
-  "wiki",
-  "mago",
-  "aguav",
-  "iapapa",
-  "razz",
-  "bluk",
-  "nanabu",
-  "wepear",
-  "pinap"
+  2, 3, 4, 5, 8, 12
 ];
 const BerriesApiListFilter = ({ filterBerry, handleFilterChange }) => {
   return (
