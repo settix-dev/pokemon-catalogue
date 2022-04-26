@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { connect } from "react-redux";
+import { connect, useSelector } from "react-redux";
 import { createBerry, fetchBerries } from "../store/actions";
 import { changeBerryFilter } from "../store/actions/changeFilterAction";
 import { fetchBerry } from "../store/actions";
 import BerriesApiListFilter from "../components/BerriesApiListFilter";
-import Berry from "./Berry";
+import loader from "../assets/loading-buffering.gif";
 import { Link } from "react-router-dom";
 
+const state = (state) => state.berryDetails; // Retrieve berry items details state from redux store
 const Berries = (props) => {
+  const berryItemsArray = useSelector(state).berryItemsArray;
+  console.log(berryItemsArray);
   const [filterBerry, setFilterBerry] = useState("");
-  // const [berry, setBerry] = useState('cheri')
   const {
     myFetchBerries,
     myBerriesCollection,
@@ -36,28 +38,21 @@ const Berries = (props) => {
 
     setFilterBerry(e.target.value === "All" ? "" : e.target.value);
   };
-console.log(berries)
+  console.log(berries);
   console.log(`filter: ${filterBerry}`);
 
   useEffect(() => {
-    // berries.length !== 1 &&
     if (berries[0].results.length === 0) {
       myFetchBerries();
     }
   }, []);
 
-  // useEffect(() => {
-  //   // myChangeBerryFilter(filterBerry);
-  //   // myFetchBerry(filterBerry);
-  //   filterBerry === "All"
-  //     ? myChangeBerryFilter("")
-  //     : myChangeBerryFilter(filterBerry);
-  //   myFetchBerry(filterBerry);
-  // }, [myChangeBerryFilter, myFetchBerry, filterBerry]);
-
-  // useEffect( () => {
-  //   myFetchBerry(filterBerry)
-  // }, [myFetchBerry, filterBerry])
+  useEffect(() => {
+    filterBerry === "All"
+      ? myChangeBerryFilter("")
+      : myChangeBerryFilter(filterBerry);
+    console.log("I have also made it here.");
+  }, [myChangeBerryFilter, myFetchBerry, filterBerry]);
 
   const handleBerryClick = (e) => {
     console.log(e);
@@ -71,44 +66,35 @@ console.log(berries)
         filterBerry={filterBerry}
         handleFilterChange={handleFilterChange}
       />
-
       {berries.map((berry, index) => (
         <ul key={index}>
           <>
-            {berry.results.length !== 0
-              ? berry.results.map((result, index) => (
-                  <div key={index}>
-                    <>
-                      {result.url}
-                      <Link
-                        to="/berry"
-                        onClick={() => handleBerryClick(result)}
-                      >
-                        {result.name}
-                      </Link>
-                    </>
-                  </div>
-                ))
-              : "Loading in progress..."}
-
-            {/* {berry.results.length &&
-              berry.results.map((result, index) => (
+            {berry.results.length !== 0 ? (
+              (filterBerry === ""
+                ? berry.results
+                : berryItemsArray.filter(
+                    (result) => result.growth_time.toString() === filterBerry
+                  )
+              ).map((result, index) => (
                 <div key={index}>
                   <>
-                    {result.url}
                     <Link
-                      to="/berry"
-                      onClick={() => handleBerryClick(result.name)}
+                      to={`/berry/${result.name}`}
+                      onClick={() => handleBerryClick(result)}
                     >
                       {result.name}
                     </Link>
                   </>
                 </div>
-              ))} */}
+              ))
+            ) : (
+              <div>
+                <img src={loader} alt="loading" />
+              </div>
+            )}
           </>
         </ul>
       ))}
-      <Link to="/berry">Berry</Link>
     </div>
   );
 };

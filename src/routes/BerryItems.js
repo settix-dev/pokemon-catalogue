@@ -1,22 +1,23 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { fetchBerry } from "../store/actions";
 import { useDispatch } from "react-redux";
-import _ from "lodash";
+import loader from "../assets/ezgif-2-6d0b072c3d3f.gif";
 
 const state = (state) => state.berriesCollection; // retrieve current berry state from redux store
 const state2 = (state) => state.berryDetails; // retrieve berry items state from redux store
 
 const BerryItems = () => {
   const berryDetailsArray = useSelector(state2).berryItemsArray;
+  console.log("Hello Gift!!");
+  console.log(berryDetailsArray);
   const berry = useSelector(state).currentBerry;
   const dispatch = useDispatch();
   console.log(berry);
   const [berryHolder, setBerryHolder] = useState(null);
-
-  // Avoid duplicate api calls using memoization function
-  // const memoizedFetchBerry = _.memoize(fetchBerry())
-  // const memoizedFetchBerry = useMemo(fetchBerry, [berry.name])
+  let filter = window.location.pathname.split("/");
+  console.log(window.location);
+  filter = filter[filter.length - 1];
 
   const berryItemsList = (selectedBerry) => {
     return (
@@ -34,31 +35,35 @@ const BerryItems = () => {
 
   useEffect(() => {
     let foundBerry = false;
-    if (berry) {
-      berryDetailsArray.map((singleBerry) => {
-        if (berry.name === singleBerry.name) {
-          setBerryHolder({ ...singleBerry });
-          foundBerry = true;
-          console.log("There is something now in berry holder!!");
-          console.log(`single berry: ${singleBerry}`);
-        }
-      });
-      if (!foundBerry) {
-        console.log("I reached here!!");
-        setBerryHolder({...fetchBerry(berry.name)(dispatch)}); //
+    berryDetailsArray.map((singleBerry) => {
+      if (filter === singleBerry.name) {
+        setBerryHolder({ ...singleBerry });
+        foundBerry = true;
+        console.log("There is something now in berry holder!!");
+        console.log(`single berry: ${singleBerry}`);
       }
+    });
+
+    if (!foundBerry) {
+      console.log("I reached here!!");
+
+      // setBerryHolder({...fetchBerry(berry.name)(dispatch)});
+      // Use IIFE because fetch berry returns a promise
+      (async () => {
+        setBerryHolder({ ...(await fetchBerry(filter)(dispatch)) });
+      })();
     }
   }, []);
 
   return (
     <div>
       <h2>Berry Items</h2>
-      {berryHolder && <p>{JSON.stringify(berryHolder)}</p>}
-      {/* <Link to="/berry">BerryItems</Link> */}
       {berryHolder ? (
         berryItemsList(berryHolder)
       ) : (
-        <p>No items yet, please wait...</p>
+        <div>
+          <img src={loader} alt="loading" />
+        </div>
       )}
     </div>
   );

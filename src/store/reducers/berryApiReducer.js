@@ -10,7 +10,7 @@ const berryApiReducer = (state = initialState, action) => {
     case FETCH_BERRY:
       console.log(state)
       return {
-        berryItemsArray: [...state.berryItemsArray, action.payload],
+        berryItemsArray: [...state.berryItemsArray].concat(action.payload),
       };
     default:
       return state;
